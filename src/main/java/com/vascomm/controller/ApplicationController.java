@@ -22,8 +22,8 @@ import static com.vascomm.util.constant.ResponseCode.OK;
 @RestController
 @RequestMapping()
 public class ApplicationController {
-    @GetMapping()
-    public ResponseEntity<ResponseAPI> mobileApplication() {
+    @GetMapping("health-check")
+    public ResponseEntity<ResponseAPI> vascomApplication() {
         Map<String, Object> out = new HashMap<>();
 
         out.put("service", "vascomm-service");
@@ -32,31 +32,4 @@ public class ApplicationController {
         return new ResponseEntity<>(new ResponseAPI(200, OK, null, out), HttpStatus.OK);
     }
 
-    @GetMapping("/check-hostname")
-    public ResponseEntity<ResponseAPI> checkHostname(HttpServletRequest request) throws UnknownHostException {
-
-        String xForwardedForHeader = request.getHeader("X-Forwarded-For");
-        String ipRequest;
-        String ipServer;
-        if (xForwardedForHeader == null) {
-            ipRequest = request.getRemoteAddr();
-        } else {
-            ipRequest = new StringTokenizer(xForwardedForHeader, ",").nextToken().trim();
-        }
-        try (final DatagramSocket socket = new DatagramSocket()) {
-            socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
-            ipServer = socket.getLocalAddress().getHostAddress();
-        } catch (IOException e) {
-            ipServer = "failed get ip";
-        }
-
-        Map<String, Object> out = new HashMap<>();
-
-        out.put("IPRequest", ipRequest);
-        out.put("IPServer", ipServer);
-        out.put("Hostname", InetAddress.getLocalHost().getHostName());
-        out.put("Time", new Date().toString());
-
-        return new ResponseEntity<>(new ResponseAPI(200, OK, null, out), HttpStatus.OK);
-    }
 }
