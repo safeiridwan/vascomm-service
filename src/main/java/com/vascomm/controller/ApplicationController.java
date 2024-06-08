@@ -1,23 +1,17 @@
 package com.vascomm.controller;
 
 import com.vascomm.response.ResponseAPI;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.StringTokenizer;
 
-import static com.vascomm.util.constant.ResponseCode.OK;
+import static com.vascomm.util.constant.ResponseMessage.OK;
 
 @RestController
 @RequestMapping()
