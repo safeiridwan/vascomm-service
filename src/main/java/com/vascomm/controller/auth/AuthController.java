@@ -1,6 +1,7 @@
 package com.vascomm.controller.auth;
 
 import com.vascomm.controller.auth.request.LoginRequest;
+import com.vascomm.controller.auth.request.Oauth2GoogleRequest;
 import com.vascomm.controller.auth.request.RegisterRequest;
 import com.vascomm.response.ResponseAPI;
 import com.vascomm.service.auth.AuthService;
@@ -28,6 +29,11 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<ResponseAPI> login(@Valid @RequestBody LoginRequest request) {
         return service.login(request);
+    }
+
+    @PostMapping("/oauth2/google")
+    public ResponseEntity<ResponseAPI> oauth2Google(@Valid @RequestBody Oauth2GoogleRequest request) {
+        return service.oauth2Google(request);
     }
 
 }

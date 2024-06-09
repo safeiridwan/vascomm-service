@@ -1,19 +1,17 @@
 package com.vascomm.service.auth;
 
 import com.vascomm.controller.auth.request.LoginRequest;
+import com.vascomm.controller.auth.request.Oauth2GoogleRequest;
 import com.vascomm.controller.auth.request.RegisterRequest;
 import com.vascomm.entity.User;
 import com.vascomm.repository.UserRepository;
 import com.vascomm.response.ResponseAPI;
 import com.vascomm.util.JwtHelperUtil;
+import com.vascomm.util.oauth2.GoogleUtil;
+import com.vascomm.util.oauth2.Oauth2GoogleResponse;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -24,7 +22,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import static com.vascomm.util.constant.ResponseMessage.SERVER_ERROR;
 import static java.util.Collections.emptyList;
 
 import static com.vascomm.util.constant.Constant.ADMIN_ROLE;
@@ -33,10 +30,10 @@ import static com.vascomm.util.constant.ResponseMessage.OK;
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService, UserDetailsService {
-    private static final Logger logger = LoggerFactory.getLogger(AuthServiceImpl.class);
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final JwtHelperUtil jwtUtil;
+    private final GoogleUtil googleUtil;
 
     @Override
     public ResponseEntity<ResponseAPI> registrationUser(RegisterRequest request) {
@@ -100,6 +97,27 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
         if (!b.matches(request.getPassword(), user.getPassword())) {
             return new ResponseEntity<>(new ResponseAPI(401, "Username or password invalid.", null, null), HttpStatus.UNAUTHORIZED);
         }
+
+        Map<String, String> res = new HashMap<>();
+        res.put("token", jwtUtil.generateToken(user.getUserId()));
+        return new ResponseEntity<>(new ResponseAPI(200, OK, null, res), HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<ResponseAPI> oauth2Google(Oauth2GoogleRequest request) {
+        Oauth2GoogleResponse googlePayload = googleUtil.getGooglePayload(request.getToken());
+        User user = userRepository.findByEmail(googlePayload.getEmail());
+        if (user == null) {
+            user = new User();
+            user.setUserId(UUID.randomUUID().toString());
+            user.setFirstName(googlePayload.getFirstName());
+            user.setLastName(googlePayload.getLastName());
+            user.setEmail(googlePayload.getEmail());
+            user.setUserStatus(Boolean.TRUE);
+        }
+
+        user.setUpdatedBy(googlePayload.getFirstName());
+        userRepository.save(user);
 
         Map<String, String> res = new HashMap<>();
         res.put("token", jwtUtil.generateToken(user.getUserId()));
