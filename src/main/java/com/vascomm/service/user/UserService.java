@@ -1,6 +1,5 @@
 package com.vascomm.service.user;
 
-import com.vascomm.controller.auth.request.RegisterRequest;
 import com.vascomm.controller.user.request.EditUserRequest;
 import com.vascomm.response.ResponseAPI;
 import com.vascomm.util.PageInput;
