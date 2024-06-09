@@ -41,7 +41,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ResponseEntity<ResponseAPI> editProduct(String productId, EditProductRequest request) {
-        Product product = productRepository.findById(productId).orElse(null);
+        Product product = productRepository.FindByIdAndProductStatus(productId, Boolean.TRUE);
         if (product == null) {
             return new ResponseEntity<>(new ResponseAPI(400, "Product not found", null, null), HttpStatus.BAD_REQUEST);
         }
@@ -64,7 +64,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ResponseEntity<ResponseAPI> detailProduct(String productId) {
-        Product product = productRepository.findById(productId).orElse(null);
+        Product product = productRepository.FindByIdAndProductStatus(productId, Boolean.TRUE);
         if (product == null) {
             return new ResponseEntity<>(new ResponseAPI(400, "Product not found", null, null), HttpStatus.BAD_REQUEST);
         }
@@ -102,12 +102,13 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ResponseEntity<ResponseAPI> deleteProduct(String productId) {
-        Product product = productRepository.findById(productId).orElse(null);
+        Product product = productRepository.FindByIdAndProductStatus(productId, Boolean.TRUE);
         if (product == null) {
             return new ResponseEntity<>(new ResponseAPI(400, "Product not found", null, null), HttpStatus.BAD_REQUEST);
         }
 
-        productRepository.delete(product);
+        product.setProductStatus(Boolean.FALSE);
+        productRepository.save(product);
         return new ResponseEntity<>(new ResponseAPI(200, OK, null, null), HttpStatus.OK);
     }
 }

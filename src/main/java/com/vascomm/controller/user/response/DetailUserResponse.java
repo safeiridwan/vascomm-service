@@ -23,9 +23,9 @@ public class DetailUserResponse {
         this.lastName = user.getLastName();
         this.email = user.getEmail();
         this.role = user.getRole();
-        this.userStatus = "Active";
+        this.userStatus = "active";
         if (!user.getUserStatus()) {
-            this.userStatus = "Inactive";
+            this.userStatus = "inactive";
         }
     }
 }

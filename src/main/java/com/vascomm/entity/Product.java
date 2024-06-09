@@ -12,6 +12,7 @@ import static com.vascomm.util.constant.Constant.USER_ROLE;
 @Table(	name = "product")
 public class Product {
     @Id
+    @Column(name = "id")
     private String id;
     @Column(name = "product_name")
     private String productName;

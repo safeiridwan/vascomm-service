@@ -28,7 +28,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ResponseEntity<ResponseAPI> editUser(String userId, EditUserRequest request) {
-        User user = userRepository.findByUserId(userId);
+        User user = userRepository.findByUserIdAndUserStatus(userId, Boolean.TRUE);
         if (user == null) {
             return new ResponseEntity<>(new ResponseAPI(400, "User not found", null, null), HttpStatus.BAD_REQUEST);
         }
@@ -51,7 +51,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ResponseEntity<ResponseAPI> detailUser(String userId) {
-        User user = userRepository.findByUserId(userId);
+        User user = userRepository.findByUserIdAndUserStatus(userId, Boolean.TRUE);
         if (user == null) {
             return new ResponseEntity<>(new ResponseAPI(400, "User not found", null, null), HttpStatus.BAD_REQUEST);
         }
@@ -69,7 +69,8 @@ public class UserServiceImpl implements UserService {
             String searchLike = "%" + pageInput.getSearch() + "%";
             Predicate namePredicate = builder.like(builder.concat(builder.concat(root.get("firstName"), " "), root.get("lastName")), searchLike);
             Predicate email = builder.like(root.get("email"), pageInput.getSearch());
-            return builder.or(namePredicate, email);
+            Predicate status = builder.equal(root.get("userStatus"), Boolean.TRUE);
+            return builder.and(builder.or(namePredicate, email), status);
         };
 
         Page<User> resultQuery = userRepository.findAll(spec, pageable);
@@ -77,10 +78,7 @@ public class UserServiceImpl implements UserService {
                 .stream()
                 .map(user -> {
                     DetailUserResponse dto = new DetailUserResponse();
-                    dto.setUserId(user.getUserId());
-                    dto.setFirstName(user.getFirstName());
-                    dto.setLastName(user.getLastName());
-                    dto.setEmail(user.getEmail());
+                    dto.generate(user);
                     return dto;
                 })
                 .toList();
@@ -92,12 +90,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ResponseEntity<ResponseAPI> deleteUser(String userId) {
-        User user = userRepository.findByUserId(userId);
+        User user = userRepository.findByUserIdAndUserStatus(userId, Boolean.TRUE);
         if (user == null) {
             return new ResponseEntity<>(new ResponseAPI(400, "User not found", null, null), HttpStatus.BAD_REQUEST);
         }
 
-        userRepository.delete(user);
+        user.setUserStatus(Boolean.FALSE);
+        userRepository.save(user);
         return new ResponseEntity<>(new ResponseAPI(200, OK, null, null), HttpStatus.OK);
     }
 }
