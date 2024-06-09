@@ -7,4 +7,5 @@ import org.springframework.http.ResponseEntity;
 
 public interface UserService {
     ResponseEntity<ResponseAPI> editUser(String userId, EditUserRequest request);
+    ResponseEntity<ResponseAPI> detailUser(String userId);
 }

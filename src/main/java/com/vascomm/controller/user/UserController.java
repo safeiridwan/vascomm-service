@@ -21,4 +21,9 @@ public class UserController {
             @Valid @RequestBody EditUserRequest request) {
         return service.editUser(userId, request);
     }
+
+    @GetMapping("/{user_id}")
+    public ResponseEntity<ResponseAPI> detailUser(@PathVariable(name = "user_id") String userId) {
+        return service.detailUser(userId);
+    }
 }

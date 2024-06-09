@@ -39,4 +39,17 @@ public class UserServiceImpl implements UserService {
 
         return new ResponseEntity<>(new ResponseAPI(200, OK, null, res), HttpStatus.OK);
     }
+
+    @Override
+    public ResponseEntity<ResponseAPI> detailUser(String userId) {
+        User user = userRepository.findByUserId(userId);
+        if (user == null) {
+            return new ResponseEntity<>(new ResponseAPI(400, "User not found", null, null), HttpStatus.BAD_REQUEST);
+        }
+
+        EditUserResponse res = new EditUserResponse();
+        res.generate(user);
+
+        return new ResponseEntity<>(new ResponseAPI(200, OK, null, res), HttpStatus.OK);
+    }
 }
