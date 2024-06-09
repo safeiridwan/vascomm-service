@@ -27,6 +27,9 @@ public class User {
     @Column(name = "role")
     private String role;
 
+    @Column(name = "user_status")
+    private Boolean userStatus;
+
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
     private String updatedBy;
@@ -37,6 +40,10 @@ public class User {
 
     @PrePersist
     public void prePersist() {
+        if (this.role == null || this.role.isEmpty()) {
+            this.role = "user";
+        }
+
         this.createdAt = new Date();
         this.updatedAt = new Date();
     }
