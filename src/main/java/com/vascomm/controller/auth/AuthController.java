@@ -1,5 +1,6 @@
 package com.vascomm.controller.auth;
 
+import com.vascomm.controller.auth.request.LoginRequest;
 import com.vascomm.controller.auth.request.RegisterRequest;
 import com.vascomm.response.ResponseAPI;
 import com.vascomm.service.auth.AuthService;
@@ -22,6 +23,11 @@ public class AuthController {
     @PostMapping("/register/admin")
     public ResponseEntity<ResponseAPI> registrationAdmin(@Valid @RequestBody RegisterRequest request) {
         return service.registrationAdmin(request);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<ResponseAPI> login(@Valid @RequestBody LoginRequest request) {
+        return service.login(request);
     }
 
 }

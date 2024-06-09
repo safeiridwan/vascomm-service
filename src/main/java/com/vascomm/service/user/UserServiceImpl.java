@@ -5,6 +5,7 @@ import com.vascomm.controller.user.response.DetailUserResponse;
 import com.vascomm.entity.User;
 import com.vascomm.repository.UserRepository;
 import com.vascomm.response.ResponseAPI;
+import com.vascomm.util.AuthenticationFacade;
 import com.vascomm.util.PageInput;
 import com.vascomm.util.PageRequestUtil;
 import jakarta.persistence.criteria.Predicate;
@@ -19,15 +20,21 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static com.vascomm.util.constant.ResponseMessage.OK;
+import static com.vascomm.util.constant.ResponseMessage.*;
+import static com.vascomm.util.constant.Constant.*;
 
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+    private final AuthenticationFacade authenticationFacade;
 
     @Override
     public ResponseEntity<ResponseAPI> editUser(String userId, EditUserRequest request) {
+        if (!authenticationFacade.getUserId().equals(userId) && !authenticationFacade.getRole().equals(ADMIN_ROLE)) {
+            return new ResponseEntity<>(new ResponseAPI(403, REQUEST_FORBIDDEN_ERROR, null, null), HttpStatus.FORBIDDEN);
+        }
+
         User user = userRepository.findByUserIdAndUserStatus(userId, Boolean.TRUE);
         if (user == null) {
             return new ResponseEntity<>(new ResponseAPI(400, "User not found", null, null), HttpStatus.BAD_REQUEST);
@@ -51,6 +58,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ResponseEntity<ResponseAPI> detailUser(String userId) {
+        if (!authenticationFacade.getUserId().equals(userId) && !authenticationFacade.getRole().equals(ADMIN_ROLE)) {
+            return new ResponseEntity<>(new ResponseAPI(403, REQUEST_FORBIDDEN_ERROR, null, null), HttpStatus.FORBIDDEN);
+        }
+
         User user = userRepository.findByUserIdAndUserStatus(userId, Boolean.TRUE);
         if (user == null) {
             return new ResponseEntity<>(new ResponseAPI(400, "User not found", null, null), HttpStatus.BAD_REQUEST);
@@ -64,6 +75,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ResponseEntity<ResponseAPI> listUser(PageInput pageInput) {
+        if (!authenticationFacade.getRole().equals(ADMIN_ROLE)) {
+            return new ResponseEntity<>(new ResponseAPI(403, REQUEST_FORBIDDEN_ERROR, null, null), HttpStatus.FORBIDDEN);
+        }
+
         Pageable pageable = PageRequestUtil.of(pageInput);
         Specification<User> spec = (root, query, builder) -> {
             String searchLike = "%" + pageInput.getSearch() + "%";
@@ -90,6 +105,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ResponseEntity<ResponseAPI> deleteUser(String userId) {
+        if (!authenticationFacade.getUserId().equals(userId) && !authenticationFacade.getRole().equals(ADMIN_ROLE)) {
+            return new ResponseEntity<>(new ResponseAPI(403, REQUEST_FORBIDDEN_ERROR, null, null), HttpStatus.FORBIDDEN);
+        }
+
         User user = userRepository.findByUserIdAndUserStatus(userId, Boolean.TRUE);
         if (user == null) {
             return new ResponseEntity<>(new ResponseAPI(400, "User not found", null, null), HttpStatus.BAD_REQUEST);

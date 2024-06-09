@@ -4,8 +4,11 @@ import com.vascomm.controller.product.request.CreateProductRequest;
 import com.vascomm.controller.product.request.EditProductRequest;
 import com.vascomm.controller.product.response.DetailProductResponse;
 import com.vascomm.entity.Product;
+import com.vascomm.entity.User;
 import com.vascomm.repository.ProductRepository;
+import com.vascomm.repository.UserRepository;
 import com.vascomm.response.ResponseAPI;
+import com.vascomm.util.AuthenticationFacade;
 import com.vascomm.util.PageInput;
 import com.vascomm.util.PageRequestUtil;
 import jakarta.persistence.criteria.Predicate;
@@ -21,14 +24,27 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.UUID;
 
-import static com.vascomm.util.constant.ResponseMessage.OK;
+import static com.vascomm.util.constant.Constant.USER_ROLE;
+import static com.vascomm.util.constant.ResponseMessage.*;
 
 @Service
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
+    private final UserRepository userRepository;
+    private final AuthenticationFacade authenticationFacade;
     @Override
     public ResponseEntity<ResponseAPI> createProduct(CreateProductRequest request) {
+        String userId = authenticationFacade.getUserId();
+        User user = userRepository.findByUserId(userId);
+        if (user == null) {
+            return new ResponseEntity<>(new ResponseAPI(403, UNAUTHORIZED_ERROR, null, null), HttpStatus.UNAUTHORIZED);
+        }
+
+        if (user.getRole().equals(USER_ROLE)) {
+            return new ResponseEntity<>(new ResponseAPI(403, REQUEST_FORBIDDEN_ERROR, null, null), HttpStatus.FORBIDDEN);
+        }
+
         Product product = new Product();
         product.setId(UUID.randomUUID().toString());
         product.setProductName(request.getProductName());
@@ -41,6 +57,16 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ResponseEntity<ResponseAPI> editProduct(String productId, EditProductRequest request) {
+        String userId = authenticationFacade.getUserId();
+        User user = userRepository.findByUserId(userId);
+        if (user == null) {
+            return new ResponseEntity<>(new ResponseAPI(403, UNAUTHORIZED_ERROR, null, null), HttpStatus.UNAUTHORIZED);
+        }
+
+        if (user.getRole().equals(USER_ROLE)) {
+            return new ResponseEntity<>(new ResponseAPI(403, REQUEST_FORBIDDEN_ERROR, null, null), HttpStatus.FORBIDDEN);
+        }
+
         Product product = productRepository.FindByIdAndProductStatus(productId, Boolean.TRUE);
         if (product == null) {
             return new ResponseEntity<>(new ResponseAPI(400, "Product not found", null, null), HttpStatus.BAD_REQUEST);
@@ -102,6 +128,16 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ResponseEntity<ResponseAPI> deleteProduct(String productId) {
+        String userId = authenticationFacade.getUserId();
+        User user = userRepository.findByUserId(userId);
+        if (user == null) {
+            return new ResponseEntity<>(new ResponseAPI(403, UNAUTHORIZED_ERROR, null, null), HttpStatus.UNAUTHORIZED);
+        }
+
+        if (user.getRole().equals(USER_ROLE)) {
+            return new ResponseEntity<>(new ResponseAPI(403, REQUEST_FORBIDDEN_ERROR, null, null), HttpStatus.FORBIDDEN);
+        }
+
         Product product = productRepository.FindByIdAndProductStatus(productId, Boolean.TRUE);
         if (product == null) {
             return new ResponseEntity<>(new ResponseAPI(400, "Product not found", null, null), HttpStatus.BAD_REQUEST);

@@ -11,7 +11,7 @@ public class ResponseMessage {
     public static final String UNAUTHORIZED_ERROR = "You are not authorized to perform the requested action.";
 
     // 403
-    public static final String REQUEST_FORBIDDEN_ERROR = "You are not authorized to perform the requested action.";
+    public static final String REQUEST_FORBIDDEN_ERROR = "You are not permitted to perform the requested action.";
 
     // 404
     public static final String NOT_FOUND = "The requested resource was not found.";
