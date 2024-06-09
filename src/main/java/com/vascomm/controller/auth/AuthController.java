@@ -19,4 +19,9 @@ public class AuthController {
         return service.registrationUser(request);
     }
 
+    @PostMapping("/register/admin")
+    public ResponseEntity<ResponseAPI> registrationAdmin(@Valid @RequestBody RegisterRequest request) {
+        return service.registrationAdmin(request);
+    }
+
 }

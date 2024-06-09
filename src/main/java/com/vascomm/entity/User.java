@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.util.Date;
+import static com.vascomm.util.constant.Constant.USER_ROLE;
 
 @Data
 @Entity
@@ -41,7 +42,7 @@ public class User {
     @PrePersist
     public void prePersist() {
         if (this.role == null || this.role.isEmpty()) {
-            this.role = "user";
+            this.role = USER_ROLE;
         }
 
         this.createdAt = new Date();

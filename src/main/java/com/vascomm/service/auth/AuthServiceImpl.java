@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
+import static com.vascomm.util.constant.Constant.ADMIN_ROLE;
 import static com.vascomm.util.constant.ResponseMessage.OK;
 
 @Service
@@ -34,6 +35,28 @@ public class AuthServiceImpl implements AuthService {
         user.setEmail(request.getEmail());
         user.setPassword(bCryptPasswordEncoder.encode(request.getPassword()));
         user.setUserStatus(Boolean.TRUE);
+
+        userRepository.save(user);
+
+        return new ResponseEntity<>(new ResponseAPI(200, OK, null, null), HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<ResponseAPI> registrationAdmin(RegisterRequest request) {
+        User user = userRepository.findByEmail(request.getEmail());
+        if (user != null) {
+            return new ResponseEntity<>(new ResponseAPI(400, "User already Exist", null, null), HttpStatus.BAD_REQUEST);
+        }
+
+        user = new User();
+        user.setUserId(UUID.randomUUID().toString());
+        user.setFirstName(request.getFirstName());
+        user.setLastName(request.getLastName());
+        user.setEmail(request.getEmail());
+        user.setPassword(bCryptPasswordEncoder.encode(request.getPassword()));
+        user.setUserStatus(Boolean.TRUE);
+        user.setRole(ADMIN_ROLE);
+
 
         userRepository.save(user);
 
