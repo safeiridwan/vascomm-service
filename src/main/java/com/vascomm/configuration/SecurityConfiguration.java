@@ -17,6 +17,7 @@ public class SecurityConfiguration {
                         .requestMatchers("/health-check").permitAll()
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/user/**").permitAll()
+                        .requestMatchers("/product/**").permitAll()
                         .anyRequest().authenticated());
         return http.build();
     }
