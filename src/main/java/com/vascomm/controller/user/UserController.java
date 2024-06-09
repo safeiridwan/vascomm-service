@@ -35,4 +35,9 @@ public class UserController {
         return service.listUser(pageInput);
     }
 
+    @DeleteMapping("/{user_id}")
+    public ResponseEntity<ResponseAPI> deleteUser(@PathVariable(name = "user_id") String userId) {
+        return service.deleteUser(userId);
+    }
+
 }

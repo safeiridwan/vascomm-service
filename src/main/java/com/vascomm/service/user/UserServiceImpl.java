@@ -89,4 +89,15 @@ public class UserServiceImpl implements UserService {
 
         return new ResponseEntity<>(new ResponseAPI(200, OK, null, res), HttpStatus.OK);
     }
+
+    @Override
+    public ResponseEntity<ResponseAPI> deleteUser(String userId) {
+        User user = userRepository.findByUserId(userId);
+        if (user == null) {
+            return new ResponseEntity<>(new ResponseAPI(400, "User not found", null, null), HttpStatus.BAD_REQUEST);
+        }
+
+        userRepository.delete(user);
+        return new ResponseEntity<>(new ResponseAPI(200, OK, null, null), HttpStatus.OK);
+    }
 }
